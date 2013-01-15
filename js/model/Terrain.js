@@ -80,7 +80,45 @@ Terrain.prototype.getHeight = function (x, z) {
     z = x.y;
     x = x.x;
   }
-  return this.terrainFn(x, z) + this.offsetY; //todo: change to linear interpolation
+
+  //get the face you are on, and interpolate between the points of that face
+
+  var geometry = this.geometry;
+
+  var gridX = geometry.widthSegments,
+      gridZ = geometry.heightSegments;
+  
+  var width_half = geometry.width / 2,
+      height_half = geometry.height / 2;
+
+  var segment_width = geometry.width / gridX,
+      segment_height = geometry.height / gridZ;
+
+  var ix = ~~((x + width_half) / segment_width),
+      iz = ~~((z + height_half) / segment_height);
+  //ix/iz hold the bottom-left corner index
+
+  var face_idx = ix + iz * gridX;
+  var face = geometry.faces[face_idx];
+
+  var top_left = geometry.vertices[face.a],
+      bottom_left = geometry.vertices[face.b],
+      bottom_right = geometry.vertices[face.c],
+      top_right = geometry.vertices[face.d];
+
+  //we go from a->b and d->c, and then from ab -> dc
+  var z_interpolation_amt = (z - top_left.z) / segment_height,
+      x_interpolation_amt = (x - top_left.x) / segment_width;
+
+  var left_interpolation_y = Math.mapLinear(z_interpolation_amt, 0, 1, top_left.y, bottom_left.y),
+      right_interpolation_y = Math.mapLinear(z_interpolation_amt, 0, 1, top_right.y, bottom_right.y);
+
+
+  var middle_z = Math.mapLinear( x_interpolation_amt, 0, 1, left_interpolation_y, right_interpolation_y);
+
+  return middle_z;
+
+  // return this.terrainFn(x, z) + this.offsetY; //todo: change to linear interpolation
 };
 
 //bigger inputScale <=> flatter

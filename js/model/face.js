@@ -173,3 +173,18 @@ Face.prototype.getArea = function() {
   };
 
 });
+
+Face.prototype.terrainVertices = function() {
+  return this.vertices.map(function (v) {
+    return terrain.onTerrain(v);
+  });
+}
+
+Face.prototype.terrainEdges = function() {
+  return this.getEdges().map(function (e) {
+    e.start = terrain.onTerrain(e.start);
+    e.end = terrain.onTerrain(e.end);
+    e.offset = e.end.clone().subSelf(e.start);
+    return e;
+  });
+}

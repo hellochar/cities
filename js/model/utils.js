@@ -266,6 +266,18 @@ function debugWireframe(obj) {
   scene.add(mesh);
 }
 
+function makeSetDirectionMatrix(up, dir) {
+  if(dir === undefined) { //called with one argument: dir only
+    dir = up;
+    up = new THREE.Vector( 0, 1, 0 );
+  }
+  var axis = up.clone().crossSelf( dir );
+
+  var radians = Math.acos( up.dot( dir.clone().normalize() ) );
+
+  return new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
+}
+
 //=======================================================================================
 //================================MONKEYPATCHING    ==============================
 //=======================================================================================
@@ -381,3 +393,33 @@ THREE.Vector2.prototype.round = function() { this.x = Math.round(this.x); this.y
 
 THREE.Vector3.prototype.toString = function() { return "("+this.x+", "+this.y+", "+this.z+")"; }
 
+THREE.Vector3.prototype.lerp = function(end, amount) {
+  return new THREE.Vector3(
+      Math.mapLinear(amount, 0, 1, this.x, end.x),
+      Math.mapLinear(amount, 0, 1, this.y, end.y),
+      Math.mapLinear(amount, 0, 1, this.z, end.z)
+      );
+}
+
+
+function makeRandomTree(size) {
+  //trunk diameter vs height is about 1/3 - 1/5 for good bulky looking ones
+
+  var trunkLen = Math.randFloat(40, 200);
+  if(Math.random() < .01) trunkLen = Math.randFloat(600, 800);
+  var trunkRadius = trunkLen / 4;
+  var foliageLength = trunkLen * 1.2;
+  // var trunkRadius = Math.randFloat(10, 40);
+  // var foliageLength = Math.randFloat(30, 80);
+  var segments = 3;
+
+  var tree = new Tree(trunkLen, trunkRadius, foliageLength, segments);
+  var ang = Math.random()*2*Math.PI;
+  var mag = Math.randFloat(worldWidth/4, worldWidth/2);
+
+  var x = Math.cos(ang) * mag,
+      z = Math.sin(ang) * mag,
+      y = noiseFunc(x, z);
+  tree.position.set( x, y, z );
+  scene.add(tree);
+}

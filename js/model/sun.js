@@ -49,14 +49,14 @@ Sun.prototype.update = function () {
   this.position.set( this.sunRadius * Math.cos( this.angle ) , this.sunRadius * Math.sin( this.angle ) , 0 );
 
   //rotate the sun some amount along the positive y axis (to offset it with respect to the city)
-  var angle = 26.54 * Math.PI / 180; //26.54 degrees - completely random
-  var axis = new THREE.Vector3(0, 1, 0);
-  var matrix = new THREE.Matrix4().makeRotationAxis( axis, angle );
-
-  matrix.multiplyVector3( this.position );
+//   var angle = 26.54 * Math.PI / 180; //26.54 degrees - completely random
+//   var axis = new THREE.Vector3(0, 1, 0);
+//   var matrix = new THREE.Matrix4().makeRotationAxis( axis, angle );
+// 
+  // matrix.multiplyVector3( this.position );
 
   //move the sun a little off center
-  this.position.addSelf(new THREE.Vector3(380, 0, 160));
+  // this.position.addSelf(new THREE.Vector3(38, 0, 16));
 
   this.ambientLight.color.copy( lerpColor(this.currentColor, new THREE.Color(0x000000), 1 - this.directionalInfluence) );
 
@@ -74,7 +74,6 @@ Sun.prototype.defaultIntensity = function (angle) {
 };
 
 Sun.prototype.setupShadows = function () {
-  console.log('called');
   var light = this.directionalLight;
 
   light.shadowCameraNear = 200;
@@ -94,8 +93,8 @@ Sun.prototype.setupShadows = function () {
 
   light.shadowCameraVisible = true;
   // light.onlyShadow = true;
-  light.shadowDarkness = .8;
-  light.shadowBias = .0023;
+  light.shadowDarkness = .5;
+  light.shadowBias = .0033;
 
   light.castShadow = true;
 };

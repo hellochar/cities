@@ -3,52 +3,37 @@ window.onFinish.push(function () {
 
 // scene, camera, renderer, controls, stats;
 // sun;
+//
+
+//=====physics variables
 
 //=====model variables
 
 debugTerrain = false;
 debugLight = false;
-noShadows = false;
-debugBuilding = false;
-simpleBuildings = false;
-//the world exists on a rect in [-worldWidth/2, worldWidth/2] and [-worldHeight/2, worldHeight/2]
-worldWidth = worldHeight = 3000;
+noShadows = true;
+debugOnlyOneBuilding = false;
+debugGeneration = false;
 
-//terrain is a mesh holding the terrain data
-// terrain;
-// terrainOffset;
-// city;
+var debugAll = false;
+if(debugAll) {
+  _(window).keys().filter(function (name) { return /^debug.+$/.test(name); }).forEach(function (name) {
+    console.log("turning on "+name);
+    window[name] = true;
+  });
+}
+//the world exists on a rect in [-worldWidth/2, worldWidth/2] and [-worldHeight/2, worldHeight/2]
+worldWidth = worldHeight = 5000;
 
 trees = [];
 
-function makeRandomTree(size) {
-  //trunk diameter vs height is about 1/3 - 1/5 for good bulky looking ones
-
-  var trunkLen = Math.randFloat(40, 200);
-  if(Math.random() < .01) trunkLen = Math.randFloat(600, 800);
-  var trunkRadius = trunkLen / 4;
-  var foliageLength = trunkLen * 1.2;
-  // var trunkRadius = Math.randFloat(10, 40);
-  // var foliageLength = Math.randFloat(30, 80);
-  var segments = 3;
-
-  var tree = new Tree(trunkLen, trunkRadius, foliageLength, segments);
-  var ang = Math.random()*2*Math.PI;
-  var mag = Math.randFloat(worldWidth/4, worldWidth/2);
-
-  var x = Math.cos(ang) * mag,
-      z = Math.sin(ang) * mag,
-      y = noiseFunc(x, z);
-  tree.position.set( x, y, z );
-  scene.add(tree);
-}
-
 function init() {
+  scene = new THREE.Scene();
 
-  Math.seedrandom('qwer');
+  // Math.seedrandom('qwer');
 
   //set up model
-  terrain = new Terrain(worldWidth, worldHeight, 10, 10);
+  terrain = new Terrain(worldWidth, worldHeight, 50, 50);
 
   //building the city:
   var parameters = {max: 1000, limit: 500, frequency: .02 };
@@ -56,11 +41,10 @@ function init() {
   // parameters =     {max: 1000, limit: 50,  frequency: .01, minDist: 8, maxDist: 25 };
   // parameters =     {max: 100,  limit: 5,   frequency: .01 };
   parameters = {max: 10000, limit: 2500, frequency: .02};
-  city = new City(2000, 2000, 0.06, parameters);
+  city = new City(600, 600, 0.2, parameters);
   $('#overlay').append(city.land.canvas);
 
   //Set up required three.js components
-  scene = new THREE.Scene();
   // scene.add(city.mesh);
   city.meshes.forEach(scene.add, scene);
   scene.add(terrain.mesh);
@@ -72,11 +56,24 @@ function init() {
   cMesh.castShadow = true;
   scene.add(cMesh);
 
+
+  //add water
+  (function () {
+    var waterLevel = 180;
+    var waterGeom = new THREE.PlaneGeometry(worldWidth * 10, worldHeight * 10);
+    waterGeom.makeRotationX( -Math.PI/2 );
+    waterGeom.makeTranslation( new THREE.Vector3(0, terrain.offsetY + waterLevel, 0));
+    var waterMat = new THREE.MeshPhongMaterial({color: 0x224488});
+
+    var mesh = new THREE.Mesh(waterGeom, waterMat);
+    scene.add(mesh);
+  })();
+
   camera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 1, worldWidth * 3);
   camera.position.y = city.width * .4;
   camera.position.z = city.width * .5;
 
-  if(debugBuilding) camera.position.divideScalar( 5 );
+  if(debugOnlyOneBuilding) camera.position.divideScalar( 5 );
 
   renderer = new THREE.WebGLRenderer({ clearColor: 0x000000, clearAlpha: 1 });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -121,17 +118,23 @@ function init() {
 
   //set up lights
 
-  sun = new Sun( 10000, 0xcccccc, 0x222222 );
+  sun = new Sun( 10000, 0xaaaaaa, 0x222222 );
   // sun = new Sun(10000, 0x202020, 0x202020);
   if( !noShadows ) {
     sun.setupShadows();
   }
-  var dirLight = new THREE.DirectionalLight( 0x222222 );
-  dirLight.position.set(1, 1, 1);
-  scene.add(dirLight);
-  if(debugLight) {
-    scene.add(new THREE.AmbientLight(0x404040));
+
+  function dirLight(hex, x, y, z) {
+    var dirLight = new THREE.DirectionalLight( hex );
+    if(y === undefined) {
+      dirLight.position.copy(x);
+    } else {
+      dirLight.position.set(x, y, z);
+    }
+    scene.add(dirLight);
   }
+  dirLight(0x222222, 1, 1, 1);
+  dirLight(0x222222, -.5, 2, -.75);
 
   window.arrow = new THREE.ArrowHelper(new THREE.Vector3(), new THREE.Vector3(0, 2000, 0), 1000, 0xffff00);
   scene.add(arrow);

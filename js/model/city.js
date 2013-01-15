@@ -22,7 +22,7 @@ function City(width, height, simScale, options) {
   var halfSim = new THREE.Vector2( this.land.width / 2, this.land.height / 2);
   this.faces = facesCanvasCoords.map(function (face) { return face.subSelf( halfSim ).multiplyScalar( 1 / simScale ); });
 
-  if(debugBuilding) {
+  if(debugOnlyOneBuilding) {
     var extent = width/5;
     this.faces = [
       new Face([
@@ -48,19 +48,20 @@ function City(width, height, simScale, options) {
   //   return ! ( face.getArea() < 100 || face.getArea() > 10000 );
   // });
 
-  this.faces = this.faces.map(function (face) { return face.getInset(40); });
+  this.faces = this.faces.map(function (face) { return face.getInset(15); });
 
-  window.si = [];
-  this.faces = this.faces.filter(function (face) {
-    var si = face.selfIntersects();
-    if(si) window.si.push(face);
-    return !si;
-  });
+  // window.si = [];
+  // this.faces = this.faces.filter(function (face) {
+  //   var si = face.selfIntersects();
+  //   if(si) window.si.push(face);
+  //   return !si;
+  // });
 
   //sort faces array by how many points the polygon has. Helps to detect crazy geometries with like 10+ faces
   //faces.sort(function (x, y) { return y.length - x.length; });
 
   this.faces.forEach(function (vertices, idx) {
+    console.log("starting "+idx);
 
     var geometry = this.createGeometry(vertices);
 
@@ -71,7 +72,13 @@ function City(width, height, simScale, options) {
 
     // var mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( [materialSide, materialRoof ] ) );
 
-    var material = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, color:color, shading: THREE.FlatShading});
+    var params = {
+      side: THREE.DoubleSide,
+      color: color,
+      shading: Math.randBoolean() ? THREE.FlatShading : THREE.SmoothShading,
+    }
+    var type = Math.randBoolean() ? THREE.MeshLambertMaterial : THREE.MeshPhongMaterial;
+    var material = new type(params);
     var mesh = new THREE.Mesh(geometry, material);
 
     mesh.castShadow = true;
@@ -100,10 +107,10 @@ City.prototype.createGeometry = function (face) {
 
   try{
     var geometry;
-    if(simpleBuildings) {
-      geometry = simpleBuilding(face, height);
+    if(debugGeneration) {
+      geometry = Builder.simpleBuilding(face, height);
     } else {
-      geometry = randomBuilding(face, height);
+      geometry = Builder.randomBuilding(face, height);
     }
 
     return geometry;
@@ -118,3 +125,4 @@ City.prototype.createGeometry = function (face) {
   }
 };
 
+City.builders = [];

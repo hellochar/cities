@@ -20,9 +20,9 @@ function Terrain(width, height, widthSegments, heightSegments, terrainFn) {
     geometry.vertices[i].set(x, y, z);
     // console.log(x+', '+y+', '+z);
   }
+  this.offsetY = THREE.GeometryUtils.center(geometry).y; //put terrain at y=0
   geometry.computeFaceNormals();
   geometry.computeVertexNormals();
-  this.offsetY = THREE.GeometryUtils.center(geometry).y; //put terrain at y=0
 
   geometry.dynamic = false;
 
@@ -56,6 +56,8 @@ function Terrain(width, height, widthSegments, heightSegments, terrainFn) {
   // }
 
   var material = new THREE.MeshLambertMaterial({color: 0xa2d986, shading: THREE.FlatShading});
+  // var material = new THREE.MeshNormalMaterial({shading: THREE.FlatShading});
+  // var material = undefined;
 
   this.mesh = new THREE.Mesh(geometry, material);
   this.mesh.castShadow = true;
@@ -91,19 +93,21 @@ function makeNoiseFunc(inputScale, outputScale) {
 }
 
 Terrain.defaultTerrainFn = (function (){
-  var base_0 = makeNoiseFunc(6000, 15);
-  var base = makeNoiseFunc(2000, 3);
+  var base_0 = makeNoiseFunc(1500, 150);
+  var base = makeNoiseFunc(4, 25);
   // var features1 = makeNoiseFunc(480, 1);
   // var features2 = makeNoiseFunc(100, 1);
 
   var hill = function (x, y) {
-    return 2 / Math.pow( Math.pow( (x*x+y*y) / (5000 * 5000), 2) + 1, 2 );
+    return 200 / Math.pow( Math.pow( (x*x+y*y) / (1600 * 1600), 2) + 1, 4 );
   };
-  var hillNoise = makeNoiseFunc(8000, 1);
+  var hillNoise = makeNoiseFunc(4000, 1);
 
   return function (x, y) {
     if(debugTerrain === true) return 0;
-    var value = (base_0(x, y) + base(x, y) + /* features1(x, y) * (1+features2(x, y))/2 + */ hill(x, y)*(4+hillNoise(x, y))/5) * 100;
+    // var value = (base_0(x, y) + base(x, y) + /* features1(x, y) * (1+features2(x, y))/2 + */ hill(x, y)*(4+hillNoise(x, y))/5) * 100;
+    // var value = (base_0(x, y) + base(x, y) + hill(x, y)*(4+hillNoise(x, y))/5) * 1;
+    var value = (base_0(x, y) + base(x, y) + hill(x, y) * (3+hillNoise(x, y))/4 ) * 1;
     return value;
   };
 })();

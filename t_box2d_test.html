@@ -1,0 +1,122 @@
+<html>
+  <head>
+    <title>box2d test</title>
+    <link rel='stylesheet' href='style.css'>
+  </head>
+  <body>
+    <script src="include.js"></script>
+    <!-- <script src="t_setup.js"></script> -->
+
+    <canvas id="canvas" width="600" height="400"></canvas>
+    <script>
+      window.onFinish.push(function () {
+      var world;
+
+      function init() {
+        var   b2Vec2 = Box2D.Common.Math.b2Vec2
+        ,       b2BodyDef = Box2D.Dynamics.b2BodyDef
+        ,       b2Body = Box2D.Dynamics.b2Body
+        ,       b2FixtureDef = Box2D.Dynamics.b2FixtureDef
+        ,       b2Fixture = Box2D.Dynamics.b2Fixture
+        ,       b2World = Box2D.Dynamics.b2World
+        ,       b2MassData = Box2D.Collision.Shapes.b2MassData
+        ,       b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+        ,       b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
+        ,       b2DebugDraw = Box2D.Dynamics.b2DebugDraw
+        ;
+
+        world = new b2World(
+        new b2Vec2(0, 10)    //gravity
+        ,  true                 //allow sleep
+        );
+
+        fixDef = new b2FixtureDef;
+        fixDef.density = 1.0;
+        fixDef.friction = 0.5;
+        fixDef.restitution = 0.2;
+
+        bodyDef = new b2BodyDef;
+
+        var pts = [[0, 10], [5, 9], [9, 8.5], [15, 9], [14, 10], [9, 11], [0, 11]].map(function (arr) { return new THREE.Vector2(arr[0], arr[1]); });
+        //create ground
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.x = .1;
+        bodyDef.position.y = 0;
+        fixDef.shape = new b2PolygonShape;
+        // fixDef.shape.
+        // pts.forEach(function (three_v2) {
+        //   fixDef.shape.m_
+        // });
+        // fixDef.shape.SetAsBox(10, 0.5);
+        fixDef.shape.SetAsArray(pts.map(function (three_v2) { return new b2Vec2(three_v2.x, three_v2.y); }), pts.length);
+        world.CreateBody(bodyDef).CreateFixture(fixDef);
+        // return;
+
+        //create some objects
+        bodyDef.type = b2Body.b2_dynamicBody;
+        for(var i = 0; i < 10; ++i) {
+          if(Math.random() > 0.5) {
+            fixDef.shape = new b2PolygonShape;
+            fixDef.shape.SetAsBox(
+            Math.random() + 0.1 //half width
+            ,  Math.random() + 0.1 //half height
+            );
+            } else {
+            fixDef.shape = new b2CircleShape(
+            Math.random() + 0.1 //radius
+            );
+          }
+          bodyDef.position.x = Math.random() * 10;
+          bodyDef.position.y = Math.random() * 10;
+          world.CreateBody(bodyDef).CreateFixture(fixDef);
+        }
+
+        //setup debug draw
+        debugDraw = new b2DebugDraw();
+        debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
+        debugDraw.SetDrawScale(30.0);
+        debugDraw.SetFillAlpha(0.3);
+        debugDraw.SetLineThickness(1.0);
+        debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+        world.SetDebugDraw(debugDraw);
+
+        window.setInterval(update, 1000 / 60);
+      };
+      init();
+
+      function update() {
+        world.Step(
+        1 / 60   //frame-rate
+        ,  10       //velocity iterations
+        ,  10       //position iterations
+        );
+        world.DrawDebugData();
+        world.ClearForces();
+      };
+
+    });
+    </script>
+    <!-- <script> -->
+    <!--   window.onFinish.push(function() {  -->
+    <!--     setupLights(); -->
+    <!--     camera.position.multiplyScalar(.2); -->
+
+    <!--     var cube = new THREE.CubeGeometry(5, 5, 5); -->
+    <!--     var cube2 = new THREE.CubeGeometry(5, 5, 5); -->
+    <!--     cube2.applyMatrix(new THREE.Matrix4().makeTranslation('qwer') ); -->
+
+    <!--     var csg = THREE.CSG.toCSG( cube ); -->
+    <!--     var subtracted = csg.subtract( THREE.CSG.toCSG( cube2 ) ); -->
+
+    <!--     var subGeom = THREE.CSG.fromCSG( subtracted ); -->
+
+    <!--     var mat = new THREE.MeshNormalMaterial(); -->
+
+    <!--     var mesh = new THREE.Mesh(subGeom, mat); -->
+    <!--     scene.add(mesh); -->
+    <!--   }); -->
+    <!-- </script> -->
+  </body>
+</html>
+
+

@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <title>extrude holes</title>
+    <link rel='stylesheet' href='style.css'>
+  </head>
+  <body>
+    <script src="include.js"></script>
+    <script src="t_setup.js"></script>
+
+    <script>
+      window.onFinish.push(function() { 
+        setupLights();
+        camera.position.multiplyScalar(1);
+
+        var width = 15;
+        var height = 10;
+        var arcShape = new THREE.Shape();
+        arcShape.moveTo(-width/2, 0);
+        arcShape.lineTo(width/2, 0);
+        arcShape.lineTo(width/2, height);
+        arcShape.lineTo(-width/2, height);
+
+        var holePath = new THREE.Path();
+        holePath.moveTo(0, -1);
+        holePath.lineTo(0, 5);
+        holePath.lineTo(5, 5);
+        holePath.lineTo(5, -1);
+        arcShape.holes.push( holePath );
+
+        var geom = arcShape.extrude({amount: 5, bevelEnabled: false});
+
+        var mesh = new THREE.Mesh(geom, new THREE.MeshNormalMaterial());
+        scene.add(mesh);
+      });
+    </script>
+  </body>
+</html>
+
+

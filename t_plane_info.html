@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <title>plane info</title>
+    <link rel='stylesheet' href='style.css'>
+  </head>
+  <body>
+    <script src="include.js"></script>
+    <script src="t_setup.js"></script>
+
+    <script>
+      window.onFinish.push(function() { 
+        setupLights();
+        camera.position.multiplyScalar(.4);
+
+        plane = new THREE.PlaneGeometry(6, 12, 6, 12);
+
+        plane.makeRotationX( - Math.PI / 2 );
+        plane.makeTranslation( new THREE.Vector3( 0, -.01, 0));
+
+        // function makeText(text, loc, size, height, material) {
+        plane.vertices.forEach(function (loc, idx) {
+          makeText(idx, loc, .2, .02);
+        });
+        plane.faces.forEach(function (face, idx) {
+          makeText(idx, face.centroid, .3, .03);
+          scene.add(new THREE.ArrowHelper(face.normal, face.centroid, 1));
+        });
+
+
+        (function () {
+
+          var x = 1.1,
+              z = 1.1;
+
+          var gridX = plane.widthSegments,
+          gridZ = plane.heightSegments;
+
+          var width_half = plane.width / 2,
+          height_half = plane.height / 2;
+
+          var segment_width = plane.width / gridX,
+          segment_height = plane.height / gridZ;
+
+          var ix = ~~((x + width_half) / segment_width),
+          iz = ~~((z + height_half) / segment_height);
+          //ix/iz hold the bottom-left corner index
+
+          var face_idx = ix + iz * gridX;
+          var face = plane.faces[face_idx];
+          console.log(face_idx);
+        })();
+
+        scene.add(new THREE.Mesh(plane));
+      });
+    </script>
+  </body>
+</html>
+
+
+

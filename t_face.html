@@ -1,0 +1,53 @@
+<html>
+  <head>
+    <title>face test</title>
+    <link rel='stylesheet' href='style.css'>
+  </head>
+  <body>
+    <script src="include.js"></script>
+    <!-- <script src="t_setup.js"></script> -->
+
+    <canvas id="canvas" width="600" height="400"></canvas>
+    <script>
+      window.onFinish.push(function () {
+        verts = verticesFromArray([[0, 0], [2, 2], [2, 0], [0, 2]]);
+        convexHull = Face.getConvexHull(verts);
+
+        (function () {
+          var pts = [[0, 10], [5, 9], [9, 8.5], [15, 9], [14, 10], [9, 11], [0, 11]].map(function (arr) { return new THREE.Vector2(arr[0], arr[1]); });
+          var convex = new Face(pts);
+          console.log("convex isConvex? "+convex.isConvex());
+        })();
+        (function () {
+          var pts = [[0, 10], [5, 9], [9, 10],  [15, 9], [14, 10], [9, 11], [0, 11]].map(function (arr) { return new THREE.Vector2(arr[0], arr[1]); });
+
+          var concave = new Face(pts);
+          console.log("concave isConcave? "+concave.isConcave());
+        })();
+      });
+    </script>
+    <!-- <script> -->
+    <!--   window.onFinish.push(function() {  -->
+    <!--     setupLights(); -->
+    <!--     camera.position.multiplyScalar(.2); -->
+
+    <!--     var cube = new THREE.CubeGeometry(5, 5, 5); -->
+    <!--     var cube2 = new THREE.CubeGeometry(5, 5, 5); -->
+    <!--     cube2.applyMatrix(new THREE.Matrix4().makeTranslation('qwer') ); -->
+
+    <!--     var csg = THREE.CSG.toCSG( cube ); -->
+    <!--     var subtracted = csg.subtract( THREE.CSG.toCSG( cube2 ) ); -->
+
+    <!--     var subGeom = THREE.CSG.fromCSG( subtracted ); -->
+
+    <!--     var mat = new THREE.MeshNormalMaterial(); -->
+
+    <!--     var mesh = new THREE.Mesh(subGeom, mat); -->
+    <!--     scene.add(mesh); -->
+    <!--   }); -->
+    <!-- </script> -->
+  </body>
+</html>
+
+
+

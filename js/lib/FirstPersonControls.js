@@ -3,7 +3,7 @@ function FirstPersonControls(speed, tall, element) { //element should be a canva
   this.tall = tall;
   this.element = element;
 
-  this.pos2 = new THREE.Vector2();
+  // this.pos2 = new THREE.Vector2();
 
   //these two angles determine the heading
   this.azimuth = 0; //x-z; your heading projected down onto the ground plane [0-2pi]
@@ -106,13 +106,31 @@ FirstPersonControls.prototype.update = function() {
   for(key in this.keyState) {
     if(key in keyMap) { offset.addSelf(keyMap[key]); }
   }
+  offset.normalize();
   offset.multiplyScalar(this.speed);
   var offset3 = new THREE.Vector3(offset.x, 0, offset.y);
   var rotationMatrix = new THREE.Matrix4().makeRotationY( -this.azimuth );
   rotationMatrix.multiplyVector3(offset3);
 
-  this.pos2.x += offset3.x;
-  this.pos2.y += offset3.z;
+  var offsetCorrect = new THREE.Vector2(offset3.x, offset3.z);
+
+  var velocity = gameworld.playerBody.GetLinearVelocity();
+  // var speedDifference = - (this.speed - velocity.Length() );
+  var speedDifference = this.speed;
+  var movementVector = new b2Vec2(offsetCorrect.x, offsetCorrect.y);
+  movementVector.Multiply(speedDifference * gameworld.playerBody.GetMass()); //have to do -1 for some reason; not sure why yet
+  gameworld.playerBody.ApplyImpulse(movementVector, gameworld.playerBody.GetPosition());
+
+  // var dragForce = velocity.Copy();
+  // dragForce.Multiply(-2);
+  // gameworld.playerBody.ApplyForce( dragForce, gameworld.playerBody.GetWorldCenter());
+
+
+  var bodyPos = gameworld.playerBody.GetPosition();
+  this.pos2 = new THREE.Vector2(bodyPos.x, bodyPos.y);
+
+  // this.pos2.x += offset3.x;
+  // this.pos2.y += offset3.z;
 
   var y = this.calculateY(this.pos2);
   this.position = new THREE.Vector3(this.pos2.x, y, this.pos2.y);

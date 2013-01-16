@@ -7,6 +7,7 @@ function Face(obj) {
   } else {
     throw 'unknown input type ' + obj;
   }
+  if(this.vertices.length < 3) throw 'oh god';
   //detect and reverse ccw orderings
   if( this.vertices[1].clone().subSelf(this.vertices[0]).wedge(
       this.vertices[2].clone().subSelf(this.vertices[1]) ) < 0 ){

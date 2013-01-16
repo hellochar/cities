@@ -1,4 +1,15 @@
 window.onFinish.push(function () {
+b2Vec2 = Box2D.Common.Math.b2Vec2;
+b2BodyDef = Box2D.Dynamics.b2BodyDef;
+b2Body = Box2D.Dynamics.b2Body;
+b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
+b2Fixture = Box2D.Dynamics.b2Fixture;
+b2World = Box2D.Dynamics.b2World;
+b2MassData = Box2D.Collision.Shapes.b2MassData;
+b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
+b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
+b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+
 //=====three.js variables
 
 // scene, camera, renderer, controls, stats;
@@ -10,6 +21,8 @@ window.onFinish.push(function () {
 //gameworld
 
 //=====model variables
+
+var player = {};
 
 debugTerrain = false;
 debugLight = false;
@@ -57,6 +70,7 @@ function init() {
   scene.add(terrain.mesh);
 
   gameworld = new GameWorld(terrain, city);
+  player.body = gameworld.playerBody;
 
   var shadowCube = new THREE.CubeGeometry(worldWidth, worldWidth / 1e1, worldHeight);
   shadowCube.applyMatrix( new THREE.Matrix4().makeTranslation( new THREE.Vector3(0, -shadowCube.height * 2, 0) ) );
@@ -94,7 +108,7 @@ function init() {
   // renderer.shadowMapSoft = true;
 
   controls = window.trackballControls = new THREE.TrackballControls(camera);
-  window.FPScontrols = new FirstPersonControls(.5, 5, renderer.domElement);
+  window.FPScontrols = new FirstPersonControls(4, 5, renderer.domElement);
 
   $(document).keypress(function (e) { if(String.fromCharCode(e.which) == 'z') {
     if(controls instanceof FirstPersonControls) {
@@ -160,6 +174,8 @@ function render() {
   requestAnimationFrame(render);
   sun.update();
   arrow.setDirection( sun.directionalLight.position );
+
+  gameworld.update();
 
   // if(trees.length < 200) {
   //   trees.push(makeRandomTree());

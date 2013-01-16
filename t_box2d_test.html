@@ -30,26 +30,40 @@
         ,  true                 //allow sleep
         );
 
+
+        var shapes = _.range(55).map(function () {
+          var cx = Math.random() * 600,
+              cy = Math.random() * 400;
+
+          var arr = [];
+          arr.push( new THREE.Vector2( cx, cy) );
+          arr.push( new THREE.Vector2( cx + Math.random()*3, cy) );
+          arr.push( new THREE.Vector2( cx, cy + Math.random() * 3) );
+          return arr;
+        });
+
+        //create ground
+        bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.x = 0;
+        bodyDef.position.y = 0;
+
+        worldBody = world.CreateBody(bodyDef);
+
         fixDef = new b2FixtureDef;
         fixDef.density = 1.0;
         fixDef.friction = 0.5;
         fixDef.restitution = 0.2;
 
-        bodyDef = new b2BodyDef;
-
-        var pts = [[0, 10], [5, 9], [9, 8.5], [15, 9], [14, 10], [9, 11], [0, 11]].map(function (arr) { return new THREE.Vector2(arr[0], arr[1]); });
-        //create ground
-        bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.x = .1;
-        bodyDef.position.y = 0;
         fixDef.shape = new b2PolygonShape;
-        // fixDef.shape.
-        // pts.forEach(function (three_v2) {
-        //   fixDef.shape.m_
-        // });
+        shapes.forEach(function (v2_array) {
+          fixDef.shape.SetAsArray(v2_array.map(function (three_v2) { return new b2Vec2(three_v2.x, three_v2.y); }), v2_array.length); 
+          worldBody.CreateFixture(fixDef);
+        });
+
         // fixDef.shape.SetAsBox(10, 0.5);
-        fixDef.shape.SetAsArray(pts.map(function (three_v2) { return new b2Vec2(three_v2.x, three_v2.y); }), pts.length);
-        world.CreateBody(bodyDef).CreateFixture(fixDef);
+        // fixDef.shape.SetAsArray(pts.map(function (three_v2) { return new b2Vec2(three_v2.x, three_v2.y); }), pts.length);
+        // world.CreateBody(bodyDef).CreateFixture(fixDef);
         // return;
 
         //create some objects
@@ -71,26 +85,30 @@
           world.CreateBody(bodyDef).CreateFixture(fixDef);
         }
 
-        //setup debug draw
-        debugDraw = new b2DebugDraw();
-        debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
-        debugDraw.SetDrawScale(30.0);
-        debugDraw.SetFillAlpha(0.3);
-        debugDraw.SetLineThickness(1.0);
-        debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
-        world.SetDebugDraw(debugDraw);
+        // //setup debug draw
+        // debugDraw = new b2DebugDraw();
+        // debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
+        // debugDraw.SetDrawScale(10.0);
+        // debugDraw.SetFillAlpha(0.3);
+        // debugDraw.SetLineThickness(1.0);
+        // debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+        // world.SetDebugDraw(debugDraw);
 
         window.setInterval(update, 1000 / 60);
       };
       init();
 
+      var stats = new Stats();
+      document.body.appendChild( stats.domElement);
       function update() {
+        stats.begin();
         world.Step(
         1 / 60   //frame-rate
         ,  10       //velocity iterations
         ,  10       //position iterations
         );
-        world.DrawDebugData();
+        stats.end(); 
+        // world.DrawDebugData();
         world.ClearForces();
       };
 

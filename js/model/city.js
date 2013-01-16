@@ -40,21 +40,22 @@ function City(width, height, simScale, options) {
     ];
   }
 
+  this.faces = this.faces.filter(function (face) { return face.vertices.length < 8 }); //kill off scary behemoths
+
+  this.faces = this.faces.map(function (face) { return face.getInset(5); });
+
+  this.faces = this.faces.map(function (face) {
+    return Face.getConvexHull(face.vertices); //this should fix both self-intersections AND concave polygons
+  });
+
   this.faces = this.faces.filter(function (face) {
-    return face.getCentroid().lengthSq() / (this.width * this.width + this.height * this.height) / 4 < Math.random();
+    var chance = face.getCentroid().lengthSq() / ((this.width * this.width + this.height * this.height) / 4);
+    console.log(chance);
+    return chance < Math.random();
   }, this);
 
   // this.faces = this.faces.filter(function (face) {
   //   return ! ( face.getArea() < 100 || face.getArea() > 10000 );
-  // });
-
-  this.faces = this.faces.map(function (face) { return face.getInset(15); });
-
-  // window.si = [];
-  // this.faces = this.faces.filter(function (face) {
-  //   var si = face.selfIntersects();
-  //   if(si) window.si.push(face);
-  //   return !si;
   // });
 
   //sort faces array by how many points the polygon has. Helps to detect crazy geometries with like 10+ faces

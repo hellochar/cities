@@ -401,7 +401,6 @@ THREE.Vector3.prototype.lerp = function(end, amount) {
       );
 }
 
-
 function makeRandomTree(size) {
   //trunk diameter vs height is about 1/3 - 1/5 for good bulky looking ones
 
@@ -422,4 +421,8 @@ function makeRandomTree(size) {
       y = noiseFunc(x, z);
   tree.position.set( x, y, z );
   scene.add(tree);
+}
+
+function verticesFromArray(arr) {
+  return arr.map(function (twoElArr) { return new THREE.Vector2(twoElArr[0], twoElArr[1]); });
 }

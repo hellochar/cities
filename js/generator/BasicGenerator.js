@@ -20,8 +20,8 @@ Builder = {
                 return Builder.level(face, thickness, inset, y);
               });
             },
-  corners : function (face, height, inset, outset) {
-              return face.getInset(inset).vertices.map(function (v) {
+  corners : function (face, height, outset) {
+              return face.vertices.map(function (v) {
                 var cube = new THREE.CubeGeometry(outset*2, height, outset*2);
                 cube.makeTranslation( terrain.onTerrain(v).addSelf(0, height/2, 0) );
                 return cube;
@@ -50,8 +50,6 @@ Builder = {
                 return face.getEdges().map(function (edge) {
                   var numSections = ~~(edge.offset.length() / sectionWidth);
                   var remainder = numSections * sectionWidth - edge.offset.length();
-
-                  console.log("making "+numSections+" insignias");
 
                   return _.range(numSections).map(function (i) {
                     var geom = baseGeom.clone();
@@ -88,8 +86,7 @@ Builder.randomBuilding = function(face, height) {
   if(Math.randBoolean()) {
     var inset = Math.randFloat(0, baseInset),
         outset = Math.randFloat(inset/2, inset);
-    console.log("inset: "+inset+", outset: "+outset);
-    sections.push(Builder.corners(face, height, inset, outset));
+    sections.push(Builder.corners(face.getInset(inset), height, outset));
   }
 
   if(Math.randBoolean()) {
@@ -115,7 +112,7 @@ Builder.randomBuilding = function(face, height) {
         var insetAmount = Math.randFloat(2, baseInset);
         var yPos = Math.randFloat(20*i, height - insignia_height);
 
-        var insignias = Builder.insignias(face, shape, sectionWidth, insetAmount, yPos);
+        var insignias = Builder.insignias(face.getInset(baseInset), shape, sectionWidth, insetAmount, yPos);
         
         sections.push(insignias);
       }
@@ -135,7 +132,7 @@ Builder.simpleBuilding = function(face, height) {
   var sections = [
     // Builder.segment(face, height, 0),
     Builder.perimeter(face),
-    Builder.insignias(face, Insignias.archway(10, 10), 40, 5, 0),
+    // Builder.insignias(face, Insignias.archway(10, 10), 40, 5, 0),
     ];
 
   console.log("       finished building sections");

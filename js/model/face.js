@@ -1,10 +1,17 @@
+//a set of vertices defined in clockwise order
 function Face(obj) {
   if(obj[0] instanceof Edge) {
     this.vertices = obj.map(function (e) { return e.start; });
   } else if(obj[0] instanceof THREE.Vector2) {
     this.vertices = obj;
   } else {
-    throw 'unknown input type' + obj[0];
+    throw 'unknown input type ' + obj;
+  }
+  //detect and reverse ccw orderings
+  if( this.vertices[1].clone().subSelf(this.vertices[0]).wedge(
+      this.vertices[2].clone().subSelf(this.vertices[1]) ) < 0 ){
+    console.log("ccw!");
+    this.vertices.reverse();
   }
 }
 
@@ -113,6 +120,17 @@ Face.prototype.selfIntersects = function(debug) { //array of vertices or edges
   return false;
 };
 
+Face.prototype.isConcave = function() { return ! this.isConvex(); }
+
+Face.prototype.isConvex = function() {
+  var adj_edges = adjacents(this.getEdges(), true);
+  return _.every(adj_edges, function (edge_pair) {
+    var e1 = edge_pair[0],
+        e2 = edge_pair[1];
+    return e1.offset.wedge(e2.offset) > 0;
+  });
+}
+
 Face.prototype.getEdges = function() {
   var edges = [];
   for(var i = 0, l = this.vertices.length; i < l; i++) {
@@ -128,7 +146,7 @@ Face.prototype.getEdges = function() {
 
     edges.push(edge);
   }
-  _.last(edges).next = edges[0];
+  _.last(edges).next = edges.x;
   return edges;
 };
 
@@ -187,4 +205,82 @@ Face.prototype.terrainEdges = function() {
     e.offset = e.end.clone().subSelf(e.start);
     return e;
   });
+}
+
+//returns a Face object
+Face.getConvexHull = function(vertices) {
+  //taken from http://blogs.infoecho.net/echo/2007/03/13/demonstrate-quickhull-implementation-in-javascript/
+  function getDistant(cpt, bl) {
+    Vy = bl[1][0] - bl[0][0];
+    Vx = bl[0][1] - bl[1][1];
+    return (Vx * (cpt[0] - bl[0][0]) + Vy * (cpt[1] -bl[0][1]))
+  }
+
+
+  function findMostDistantPointFromBaseLine(baseLine, points) {
+    var maxD = 0;
+    var maxPt = [];
+    var newPoints = [];
+    for(var idx = 0; idx < points.length; idx++) {
+      var pt = points[idx];
+      var d = getDistant(pt, baseLine);
+
+      if ( d > 0) {
+        newPoints.push(pt);
+      } else {
+        continue;
+      }
+
+      if ( d > maxD ) {
+        maxD = d;
+        maxPt = pt;
+      }
+
+    }
+    return {'maxPoint':maxPt, 'newPoints':newPoints};
+  }
+
+
+
+
+  function buildConvexHull(baseLine, points) {
+
+    var convexHullBaseLines = [];
+    var t = findMostDistantPointFromBaseLine(baseLine, points);
+    if (t.maxPoint.length) {
+      convexHullBaseLines = convexHullBaseLines.concat( buildConvexHull( [baseLine[0],t.maxPoint], t.newPoints) );
+      convexHullBaseLines = convexHullBaseLines.concat( buildConvexHull( [t.maxPoint,baseLine[1]], t.newPoints) );
+      return convexHullBaseLines;
+    } else {
+      return [baseLine];
+    }
+  }
+
+  function getConvexHull(points) {
+    //find first baseline
+    var maxX, minX;
+    var maxPt, minPt;
+    for(var idx = 0; idx < points.length; idx++) {
+      var pt = points[idx];
+      if (pt[0] > maxX || !maxX) {
+        maxPt = pt;
+        maxX = pt[0];
+      }
+      if (pt[0] < minX || !minX) {
+        minPt = pt;
+        minX = pt[0];
+      }
+    }
+    var ch = [].concat(buildConvexHull([minPt, maxPt], points),
+                       buildConvexHull([maxPt, minPt], points));
+      return ch;
+  }
+
+  var points = vertices.map(function (v2) { return [v2.x, v2.y]; });
+
+  var hull = getConvexHull(points);
+
+  var vertices = hull.map(function (edge) { return new THREE.Vector2(edge[0][0], edge[0][1]); });
+
+  return new Face(vertices);
 }

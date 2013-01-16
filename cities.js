@@ -7,6 +7,8 @@ window.onFinish.push(function () {
 
 //=====physics variables
 
+//gameworld
+
 //=====model variables
 
 debugTerrain = false;
@@ -30,7 +32,10 @@ trees = [];
 function init() {
   scene = new THREE.Scene();
 
-  // Math.seedrandom('qwer');
+  var seed = Math.random();
+  // seed = 0.8510157817509025;
+  console.log("seed: "+seed);
+  Math.seedrandom(seed);
 
   //set up model
   terrain = new Terrain(worldWidth, worldHeight, 50, 50);
@@ -41,6 +46,8 @@ function init() {
   // parameters =     {max: 1000, limit: 50,  frequency: .01, minDist: 8, maxDist: 25 };
   // parameters =     {max: 100,  limit: 5,   frequency: .01 };
   parameters = {max: 10000, limit: 2500, frequency: .02};
+  // parameters = {max: 10000, limit: 2500, frequency: .02, maxDist: 10};
+  // parameters = {max: 10000, limit: 2500, frequency: .2, minDist: 2, maxDist: 5, speed: 1};
   city = new City(600, 600, 0.2, parameters);
   $('#overlay').append(city.land.canvas);
 
@@ -49,13 +56,14 @@ function init() {
   city.meshes.forEach(scene.add, scene);
   scene.add(terrain.mesh);
 
+  gameworld = new GameWorld(terrain, city);
+
   var shadowCube = new THREE.CubeGeometry(worldWidth, worldWidth / 1e1, worldHeight);
   shadowCube.applyMatrix( new THREE.Matrix4().makeTranslation( new THREE.Vector3(0, -shadowCube.height * 2, 0) ) );
   // shadowCube.faces.remove(2);
   var cMesh = new THREE.Mesh(shadowCube);
   cMesh.castShadow = true;
   scene.add(cMesh);
-
 
   //add water
   (function () {
@@ -69,7 +77,7 @@ function init() {
     scene.add(mesh);
   })();
 
-  camera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 1, worldWidth * 3);
+  camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 1, worldWidth * 3);
   camera.position.y = city.width * .4;
   camera.position.z = city.width * .5;
 
@@ -86,7 +94,7 @@ function init() {
   // renderer.shadowMapSoft = true;
 
   controls = window.trackballControls = new THREE.TrackballControls(camera);
-  window.FPScontrols = new FirstPersonControls(.8, 5, renderer.domElement);
+  window.FPScontrols = new FirstPersonControls(.5, 5, renderer.domElement);
 
   $(document).keypress(function (e) { if(String.fromCharCode(e.which) == 'z') {
     if(controls instanceof FirstPersonControls) {

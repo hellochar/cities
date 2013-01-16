@@ -3,6 +3,8 @@
     "underscore.js",      //basic js helpers
     "jquery-1.8.3.js",
 
+    "Box2dWeb-2.1.a.3.js",
+
     "seedrandom.js",      //noise and random for terrain and city generation
     "SimplexNoise.js",
     "PerlinNoise.js", 
@@ -31,6 +33,7 @@
     "Tree.js",
     "city.js",
     "Terrain.js",
+    "Gameworld.js",
   ].map(function (x) { return 'model/'+x;});
 
   var generator = [

@@ -1,4 +1,4 @@
-var Tree = function (base_length, base_radius, foliageLength, segments, doSpheres, material) {
+var TreeModel = function (base_length, base_radius, foliageLength, segments, doSpheres, material) {
 
   THREE.Object3D.call( this );
 

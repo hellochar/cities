@@ -22,6 +22,8 @@
     "TrackballControls.js", //control schemes for renderer
     "FirstPersonControls.js",
     "PivotControls.js",
+
+    "TreeModel.js",
   ].map(function (x) { return 'lib/'+x;});
 
   var model = [
@@ -30,7 +32,6 @@
     "Road.js",
     "Land.js",
     "sun.js",
-    "Tree.js",
     "city.js",
     "Terrain.js",
     "Gameworld.js",

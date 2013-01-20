@@ -102,4 +102,4 @@ var TreeModel = function (base_length, base_radius, foliageLength, segments, doS
 
 };
 
-Tree.prototype = Object.create( THREE.Object3D.prototype );
+TreeModel.prototype = Object.create( THREE.Object3D.prototype );

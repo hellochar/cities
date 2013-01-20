@@ -27,7 +27,10 @@
   ].map(function (x) { return 'lib/'+x;});
 
   var model = [
-    "utils.js", 
+    "actor.js",
+    "actor_tree.js",
+    "actor_player.js",
+    "utils.js",
     "face.js",
     "Road.js",
     "Land.js",

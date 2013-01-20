@@ -22,10 +22,8 @@ b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 
 //=====model variables
 
-var player = {};
-
 debugTerrain = false;
-debugLight = false;
+debugLight = true;
 noShadows = true;
 debugOnlyOneBuilding = false;
 debugGeneration = false;
@@ -39,8 +37,6 @@ if(debugAll) {
 }
 //the world exists on a rect in [-worldWidth/2, worldWidth/2] and [-worldHeight/2, worldHeight/2]
 worldWidth = worldHeight = 5000;
-
-trees = [];
 
 function init() {
   scene = new THREE.Scene();
@@ -70,7 +66,6 @@ function init() {
   scene.add(terrain.mesh);
 
   gameworld = new GameWorld(terrain, city);
-  player.body = gameworld.playerBody;
 
   var shadowCube = new THREE.CubeGeometry(worldWidth, worldWidth / 1e1, worldHeight);
   shadowCube.applyMatrix( new THREE.Matrix4().makeTranslation( new THREE.Vector3(0, -shadowCube.height * 2, 0) ) );
@@ -108,7 +103,7 @@ function init() {
   // renderer.shadowMapSoft = true;
 
   controls = window.trackballControls = new THREE.TrackballControls(camera);
-  window.FPScontrols = new FirstPersonControls(4, 5, renderer.domElement);
+  window.FPScontrols = new FirstPersonControls(renderer.domElement);
 
   $(document).keypress(function (e) { if(String.fromCharCode(e.which) == 'z') {
     if(controls instanceof FirstPersonControls) {
@@ -174,14 +169,18 @@ function render() {
   requestAnimationFrame(render);
   sun.update();
   arrow.setDirection( sun.directionalLight.position );
+  controls.update();
 
   gameworld.update();
 
-  // if(trees.length < 200) {
-  //   trees.push(makeRandomTree());
-  // }
+  if(gameworld.actors.length < 20) {
+    var ang = Math.random()*2*Math.PI;
+    var mag = Math.randFloat(city.width/2, city.width);
 
-  controls.update();
+    var pos = new THREE.Vector2(Math.cos(ang) * mag, Math.sin(ang) * mag);
+    new Tree(gameworld, pos); //adds to gameworld by mutation
+  }
+
   renderer.render(scene, camera);
   stats.end();
 }

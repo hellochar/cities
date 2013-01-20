@@ -4,10 +4,12 @@ function GameWorld(terrain, city) {
   this.city = city;
 
   //the x-z coordinates of the renderer map to the xy coordinates of the game
-  var world = this.world = new b2World(
+  this.world = new b2World(
       new b2Vec2(0, 0)    //gravity
       ,  true                 //allow sleep
       );
+
+  this.actors = [];
 
   //create city blocks
   var bodyDef = new b2BodyDef;
@@ -15,7 +17,7 @@ function GameWorld(terrain, city) {
   bodyDef.position.x = 0;
   bodyDef.position.y = 0;
 
-  var cityBody = world.CreateBody(bodyDef);
+  var cityBody = this.world.CreateBody(bodyDef);
 
   var fixDef = new b2FixtureDef;
   fixDef.density = 1.0;
@@ -29,23 +31,14 @@ function GameWorld(terrain, city) {
     cityBody.CreateFixture(fixDef);
   });
 
-  //create player object
-
-  bodyDef.type = b2Body.b2_dynamicBody;
-  bodyDef.linearDamping = 17;
-  // bodyDef.userData =
-  this.playerBody = world.CreateBody(bodyDef);
-
-  fixDef.shape = new b2CircleShape(.1); //radius
-  fixDef.restitution = 0.5;
-  fixDef.friction = 0;
-  fixDef.density = 10;
-
-  this.playerBody.CreateFixture(fixDef);
-
+  this.player = new Player(this); //gets added to this gameworld on initialization
 }
 
 GameWorld.prototype.update = function() {
+  
+  this.actors.forEach(function (e) {
+    e.update();
+  });
 
   this.world.Step( 1/60, 10, 10);
   this.world.ClearForces();

@@ -37,6 +37,13 @@ Actor.prototype.update = function() {
   this.setModelTransformFromWorld();
 }
 
+Actor.prototype.kill = function() {
+  this.gameworld.actors.remove(this);
+
+  scene.remove(this.model);
+  this.gameworld.world.DestroyBody(this.body);
+}
+
 Actor.defaultBodyDef = function (x, y) {
   if(y === undefined) {
     y = x.y;

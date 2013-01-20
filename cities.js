@@ -173,7 +173,7 @@ function render() {
 
   gameworld.update();
 
-  if(gameworld.actors.length < 20) {
+  if(gameworld.actors.length < 2) {
     var ang = Math.random()*2*Math.PI;
     var mag = Math.randFloat(city.width/2, city.width);
 

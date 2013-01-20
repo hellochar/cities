@@ -81,7 +81,7 @@ FirstPersonControls.prototype.unregister = function() {
 };
 
 FirstPersonControls.prototype.update = function() {
-  var d_azimuth = ( THREE.Math.mapLinear(this.movementXTotal, 0, renderer.domElement.width/2, 0, camera.fov/2 * camera.aspect) ) * Math.PI / 180;
+  var d_azimuth = ( THREE.Math.mapLinear(this.movementXTotal, 0, renderer.domElement.width/2, 0, this.fovx() / 2) ) * Math.PI / 180;
   var d_altitude = ( THREE.Math.mapLinear(this.movementYTotal, 0, renderer.domElement.height/2, 0, -camera.fov/2 ) ) * Math.PI / 180;
   this.movementXTotal = this.movementYTotal = 0;
 
@@ -113,3 +113,7 @@ FirstPersonControls.prototype.update = function() {
       );
   camera.lookAt( camera_position.clone().addSelf( heading ) );
 };
+
+FirstPersonControls.prototype.fovx = function () {
+  return camera.fov * camera.aspect;
+}

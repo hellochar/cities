@@ -1,8 +1,10 @@
 function Player(gameworld, movespeed, tall, pos) {
   
-  this.movespeed = movespeed || 400;
+  this.movespeed = movespeed || 50;
   this.tall = tall || 5;
   pos = pos || new b2Vec2(0, 0);
+
+  this.health = 100;
 
   this._altitude = 0; //how "up" or "down" you are looking at [-pi/2-pi/2]; -pi/2 means down at the ground
 
@@ -40,5 +42,8 @@ Player.prototype.logic = function () {
   //update my state based on input
   var moveDirectionWorld = this.body.GetWorldVector(this.moveDirection);
   moveDirectionWorld.Multiply(this.movespeed);
+  moveDirectionWorld.Multiply(this.body.GetMass());
   gameworld.player.body.ApplyImpulse(moveDirectionWorld, this.position());
+
+  $('#hp').text(this.health);
 }

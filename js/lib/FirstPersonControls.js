@@ -73,11 +73,18 @@ FirstPersonControls.prototype.register = function() {
   document.addEventListener('pointerlockchange', lockChangeCallback, false);
   document.addEventListener('mozpointerlockchange', lockChangeCallback, false);
   document.addEventListener('webkitpointerlockchange', lockChangeCallback, false);
+
+
+
+
+
+  gameworld.player.model.visible = false;
 };
 
 FirstPersonControls.prototype.unregister = function() {
   document.exitPointerLock();
   this.element.removeEventListener('click', this.onClick);
+  gameworld.player.model.visible = true;
 };
 
 FirstPersonControls.prototype.update = function() {
@@ -105,12 +112,8 @@ FirstPersonControls.prototype.update = function() {
   var camera_position = terrain.onTerrain( pos2 );
   camera_position.y += gameworld.player.tall;
 
+  var heading = gameworld.player.heading();
   camera.position.copy( camera_position );
-  var heading = new THREE.Vector3(
-      Math.cos(gameworld.player.azimuth()) * Math.cos(gameworld.player.altitude()),
-      Math.sin(gameworld.player.altitude()),
-      Math.sin(gameworld.player.azimuth()) * Math.cos(gameworld.player.altitude())
-      );
   camera.lookAt( camera_position.clone().addSelf( heading ) );
 };
 

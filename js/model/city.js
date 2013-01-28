@@ -80,7 +80,8 @@ function City(width, height, simScale, options) {
     }
     var type = Math.randBoolean() ? THREE.MeshLambertMaterial : THREE.MeshPhongMaterial;
     var material = new type(params);
-    var mesh = new THREE.Mesh(geometry, material);
+    // var mesh = new THREE.Mesh(geometry, material);
+    var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [material, new THREE.MeshNormalMaterial({wireframe: true})]);
 
     mesh.castShadow = true;
     mesh.receiveShadow = true;

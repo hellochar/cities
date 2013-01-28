@@ -27,9 +27,12 @@ window.onFinish.push(function () {
     scene.add(light);
   }
 
+  tasks = [];
+
   function render() {
     requestAnimationFrame(render);
     controls.update();
+    tasks.forEach(function (fn) { fn(); });
     renderer.render(scene, camera);
   }
   render();

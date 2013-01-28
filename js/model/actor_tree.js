@@ -22,6 +22,7 @@ function Tree(gameworld, pos, radius, movespeed, turnspeed, facingThreshold, att
 }
 
 Tree.prototype = Object.create( Actor.prototype );
+Tree.prototype.constructor = Tree;
 
 Tree.prototype.logic = function () {
 

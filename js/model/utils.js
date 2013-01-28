@@ -278,6 +278,13 @@ function makeSetDirectionMatrix(up, dir) {
   return new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
 }
 
+//http://stackoverflow.com/questions/332422/how-do-i-get-the-name-of-an-objects-type-in-javascript
+function classOf(instance) {
+   var funcNameRegex = /function (.{1,})\(/;
+   var results = (funcNameRegex).exec(instance.constructor.toString());
+   return (results && results.length > 1) ? results[1] : "";
+}
+
 //=======================================================================================
 //================================MONKEYPATCHING    ==============================
 //=======================================================================================
@@ -379,35 +386,6 @@ Array.prototype.flatten = function(shallow) {
 
 Array.prototype.random = function() {
   return this[_.random(this.length - 1)];
-}
-
-
-//Vector etc.
-THREE.Vector2.prototype.wedge = function (b) {
-  return this.x * b.y - this.y * b.x;
-}
-
-THREE.Vector2.prototype.toString = function() { return "("+this.x+", "+this.y+")"; }
-
-THREE.Vector2.prototype.round = function() { this.x = Math.round(this.x); this.y = Math.round(this.y); return this; }
-
-THREE.Vector2.prototype.angle = function() { return Math.atan2(this.y, this.x); }
-
-//treats the vectors as positions
-THREE.Vector2.prototype.angleTo = function(v2) { return this.clone().subSelf(v2).angle(); }
-THREE.Vector2.prototype.angleBetween = function(v2) { return Math.acos((this.dot(v2)) / (this.length() * v2.length())); }
-
-THREE.Vector2.prototype.toBox2D = function() { return new Box2D.Common.Math.b2Vec2(this.x, this.y) };
-Box2D.Common.Math.b2Vec2.prototype.toTHREE = function() { return new THREE.Vector2(this.x, this.y) };
-
-THREE.Vector3.prototype.toString = function() { return "("+this.x+", "+this.y+", "+this.z+")"; }
-
-THREE.Vector3.prototype.lerp = function(end, amount) {
-  return new THREE.Vector3(
-      Math.mapLinear(amount, 0, 1, this.x, end.x),
-      Math.mapLinear(amount, 0, 1, this.y, end.y),
-      Math.mapLinear(amount, 0, 1, this.z, end.z)
-      );
 }
 
 function verticesFromArray(arr) {

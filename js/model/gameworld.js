@@ -10,6 +10,7 @@ function GameWorld(terrain, city) {
       );
 
   this.actors = [];
+  this.items = [];
 
   //create city blocks
   var bodyDef = new b2BodyDef;
@@ -34,10 +35,19 @@ function GameWorld(terrain, city) {
   this.player = new Player(this); //gets added to this gameworld on initialization
 }
 
+GameWorld.prototype.ofType = function(type) {
+  return this.actors.filter(function (actor) {
+    return actor instanceof type;
+  });
+}
+
 GameWorld.prototype.update = function() {
   
   this.actors.forEach(function (e) {
     e.update();
+  });
+  this.items.forEach(function (i) {
+    i.update();
   });
 
   this.world.Step( 1/60, 10, 10);

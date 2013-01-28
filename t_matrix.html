@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <title>face test</title>
+    <link rel='stylesheet' href='style.css'>
+  </head>
+  <body>
+    <script src="include.js"></script>
+    <script src="t_setup.js"></script>
+
+    <script>
+      window.onFinish.push(function() {
+        setupLights();
+        camera.position.multiplyScalar(.1);
+
+        geom = new THREE.CubeGeometry(5, 5, 5);
+        mesh = new THREE.Mesh(geom, new THREE.MeshNormalMaterial());
+
+        mesh.matrixAutoUpdate = false;
+        scene.add(mesh);
+
+        tasks.push(function() {
+          mesh.matrix.rotateY(.05);
+          mesh.matrixWorldNeedsUpdate = true;
+        });
+
+      });
+    </script>
+  </body>
+</html>
+
+
+
+

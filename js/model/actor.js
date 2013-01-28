@@ -13,12 +13,10 @@ function Actor(gameworld, model, bodyDef, fixDef) {
 }
 
 Actor.prototype.setModelTransformFromWorld = function () {
-  var bodyVec2 = this.position();
-  var posVec3 = this.gameworld.terrain.onTerrain( new THREE.Vector2(bodyVec2.x, bodyVec2.y) );
+  var pos_on_terrain = this.gameworld.terrain.onTerrain( this.position().toTHREE() );
 
-  this.model.position.copy( posVec3 );
-
-  this.model.rotation.y = -this.azimuth(); //we want the negative angle
+  this.model.position = pos_on_terrain;
+  this.model.rotation.y = -this.azimuth();
 }
 
 Actor.prototype.azimuth = function () {

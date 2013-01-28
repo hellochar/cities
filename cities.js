@@ -58,11 +58,11 @@ function init() {
   // parameters = {max: 10000, limit: 2500, frequency: .02, maxDist: 10};
   // parameters = {max: 10000, limit: 2500, frequency: .2, minDist: 2, maxDist: 5, speed: 1};
   city = new City(600, 600, 0.2, parameters);
-  $('#overlay').append(city.land.canvas);
+  // $('#overlay').append(city.land.canvas);
 
   //Set up required three.js components
   // scene.add(city.mesh);
-  city.meshes.forEach(scene.add, scene);
+  // city.meshes.forEach(scene.add, scene);
   scene.add(terrain.mesh);
 
   gameworld = new GameWorld(terrain, city);
@@ -173,13 +173,17 @@ function render() {
 
   gameworld.update();
 
-  if(gameworld.actors.length < 2) {
+  if(gameworld.ofType(Tree).length < 20) {
     var ang = Math.random()*2*Math.PI;
     var mag = Math.randFloat(city.width/2, city.width);
 
     var pos = new THREE.Vector2(Math.cos(ang) * mag, Math.sin(ang) * mag);
     new Tree(gameworld, pos); //adds to gameworld by mutation
   }
+  if(Math.randBoolean(.01)) {
+    new Axe(gameworld, gameworld.player.position().toTHREE().addSelf(new THREE.Vector2(0, 5)));
+  }
+
 
   renderer.render(scene, camera);
   stats.end();

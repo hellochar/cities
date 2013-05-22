@@ -62,7 +62,7 @@ function init() {
 
   //Set up required three.js components
   // scene.add(city.mesh);
-  // city.meshes.forEach(scene.add, scene);
+  city.meshes.forEach(scene.add, scene);
   scene.add(terrain.mesh);
 
   gameworld = new GameWorld(terrain, city);
